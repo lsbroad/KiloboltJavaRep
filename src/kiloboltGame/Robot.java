@@ -4,9 +4,20 @@ import java.awt.Graphics;
 
 public class Robot {
 	
+	//constants
+	final int JUMPSPEED = -15;
+	final int MOVESPEED = 5;
+	final int GROUND = 382;
+	
 	private int centreX = 100;
-	private int centreY = 382;
+	private int centreY = GROUND;
 	private boolean jumped = false;
+	private boolean movingLeft = false;
+	private boolean movingRight = false;
+	private boolean ducked = false;
+	
+	private static Background bg1 = StartingClass.getBg1();
+	private static Background bg2 = StartingClass.getBg2();
 	
 	private int speedX = 0;
 	private int speedY  = 1;
@@ -17,21 +28,23 @@ public class Robot {
 		if (speedX < 0) {
 			centreX = centreX + speedX;
 		}
-		else if (speedX == 0) {
-			System.out.println("Do Not scroll the background");
+		else if (speedX == 0 || speedX < 0) {
+			bg1.setSpeedX(0);
+			bg2.setSpeedX(0);
 		}
 		else {
-			if (centreX <= 150){
+			if (centreX <= 200 && speedX >0){
 				centreX = centreX + speedX;
 			}
-			else {
-				System.out.println("Scroll backgroud here");
+			else if (speedX > 0 && centreX > 200){
+				bg1.setSpeedX(-MOVESPEED);
+				bg2.setSpeedX(-MOVESPEED);
 			}
 		}
 		
 		//Updates Y position
-		if (centreY + speedY >= 382){ //382 is where the character's centerY would be if he were standing on the ground.
-			centreY = 382;
+		if (centreY + speedY >= GROUND){ //382 is where the character's centerY would be if he were standing on the ground.
+			centreY = GROUND;
 		}
 		else {
 			centreY = centreY + speedY;
@@ -41,8 +54,8 @@ public class Robot {
 		if (jumped == true){
 			speedY = speedY + 1;
 			
-			if (centreY + speedY >= 382){
-				centreY = 382;
+			if (centreY + speedY >= GROUND){
+				centreY = GROUND;
 				speedY = 0;
 				jumped = false;
 			}
@@ -55,20 +68,44 @@ public class Robot {
 	}
 		
 	public void moveRight(){
-		speedX = 6;
+		if (ducked == false){
+		speedX = MOVESPEED;			
+		}
 	}
 	
 	public void moveLeft(){
-		speedX = -6;
+		if (ducked == false){
+		speedX = -MOVESPEED;			
+		}
+	}
+	
+	public void stopRight(){
+		setMovingRight(false);
+		stop();
+	}
+	
+	public void stopLeft(){
+		setMovingLeft(false);
+		stop();
 	}
 	
 	public void stop(){
-		speedX = 0;
+		if (isMovingRight() == false && isMovingLeft() == false){
+			speedX = 0;
+		}
+		
+		if (isMovingRight() == false && isMovingLeft() == true){
+			moveLeft();
+		}
+		
+		if (isMovingRight() == true && isMovingLeft() == false){
+			moveRight();
+		}
 	}
 	
 	public void jump(){
 		if (jumped == false){
-			speedY = -15;
+			speedY = JUMPSPEED;
 			jumped = true;
 		}
 	}
@@ -111,5 +148,29 @@ public class Robot {
 
 	public void setSpeedY(int speedY) {
 		this.speedY = speedY;
+	}
+	
+	public boolean isDucked(){
+		return ducked;
+	}
+	
+	public void setDucked(boolean ducked){
+		this.ducked = ducked;
+	}
+	
+	public boolean isMovingRight(){
+		return movingRight;
+	}
+	
+	public void setMovingRight(boolean movingRight){
+		this.movingRight = movingRight;
+	}
+	
+	public boolean isMovingLeft() {
+		return movingLeft;
+	}
+	
+	public void setMovingLeft (boolean movingLeft){
+		this.movingLeft = movingLeft;
 	}
 }
